@@ -4,14 +4,16 @@ Runs on: python 2.x. Depends on: pyglet.
 
 ## Usage
 
-1. Open up config
-
 	python langton.py
 
-Where 'n_ants' is the number of ants you want on the board. They'll be evenly spaced.
+Then click anywhere in the grid to spawn an ant.
+
+If you want to specify the size in pixels of the cells, add the argument:
+
+	python langton.py 20
+
+for a grid of 20x20 pixel cells (default is 10)
 
 ## Todo
 
-* Generalize multiple ants and test. 
-* Improve OpenGL code.
-* User-customize grid size
+* suggestions?

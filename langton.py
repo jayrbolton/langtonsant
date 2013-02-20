@@ -32,19 +32,19 @@ class Ant:
 
 class Grid(pyglet.window.Window):
 
-	def __init__(self): #n_ants):
+	def __init__(self,cell_size=10): #n_ants):
 
 		window.Window.__init__(self,fullscreen=True)
 
 		# Initialize screen resolution
-		self.cell_size = 10
+		self.cell_size = cell_size
 		platform = pyglet.window.get_platform()
 		display = platform.get_default_display()
 		screen = display.get_default_screen()
 		self.screen_width = screen.width
 		self.screen_height = screen.height
-		self.columns = self.screen_width / 10
-		self.rows = self.screen_height / 10
+		self.columns = self.screen_width / self.cell_size
+		self.rows = self.screen_height / self.cell_size
 
 
 		# Initialize ants
@@ -116,5 +116,7 @@ class Grid(pyglet.window.Window):
 
 
 if __name__ == "__main__":
-		h = Grid()
-		h.run()
+	try: size = int(sys.argv[1])
+	except: size = 10
+	h = Grid(size)
+	h.run()
