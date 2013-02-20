@@ -7,10 +7,10 @@ from pyglet import font
 
 class Ant:
 
-	def __init__(self,x,y,columns,rows):
+	def __init__(self,col,row,columns,rows):
 		# Initial positions of the ant.
 		self.columns = columns; self.rows = rows;
-		self.x = x ; self.y = y
+		self.col = col; self.row = row;
 
 		# set random direction where 0: west, 1: north, 2: east, 3: south
 		self.dir = random.choice([0,1,2,3])
@@ -20,19 +20,19 @@ class Ant:
 
 	def turn(self, direction):
 		# orient right (clockwise)
-		if   direction is 'right': self.dir = (self.dir + 1) % 4
+		if direction is 'right': self.dir = (self.dir + 1) % 4
 		# orient left (counter-clockwise)
 		elif direction is  'left': self.dir = (self.dir + 3) % 4
 		# Move the ant forward one square
 		self.forward()
 
 	def forward(self):
-		self.x = (self.x + self.dirs[self.dir][0]) % self.columns
-		self.x = (self.y + self.dirs[self.dir][1]) % self.rows
+		self.col = (self.col + self.dirs[self.dir][0]) % self.columns
+		self.row = (self.row + self.dirs[self.dir][1]) % self.rows
 
 class Grid(pyglet.window.Window):
 
-	def __init__(self, n_ants):
+	def __init__(self): #n_ants):
 
 		window.Window.__init__(self,fullscreen=True)
 
@@ -46,16 +46,26 @@ class Grid(pyglet.window.Window):
 		self.columns = self.screen_width / 10
 		self.rows = self.screen_height / 10
 
+
 		# Initialize ants
 		self.ants = []
-		offset_x = (self.columns-1) / n_ants;
-		offset_y = (self.rows-1) / n_ants;
-		for nth_ant in range(1, n_ants+1):
-			ant = Ant(nth_ant * offset_x, nth_ant * offset_y, self.columns, self.rows)
-			self.ants.append(ant)
+		# for nth_ant in range(1, n_ants+1):
+		# 	ant = Ant(self.columns/2+nth_ant, self.rows/2+nth_ant, self.columns, self.rows)
+		# 	self.ants.append(ant)
 
 		# Initialize all cells to False
 		self.cells = [[False] * self.columns for i in range(self.rows)]
+
+	def translate(self,pixel_x, pixel_y):
+		"Translate pixel coordinates (pixel_x,pixel_y), into grid coordinates"
+		x = pixel_x * self.columns / self.screen_width + 1
+		y = pixel_y * self.rows / self.screen_height  + 1
+		return x,y
+
+	def on_mouse_release(self,x,y,button,modifiers):
+		x,y = self.translate(x,y)
+		print('x,y = ' + str((x,y)))
+		self.ants.append(Ant(x, y, self.columns, self.rows))
 
 	def draw_cell(self, col, row):
 		# Draw an OpenGL rectangle
@@ -74,21 +84,20 @@ class Grid(pyglet.window.Window):
 
 	def draw(self):
 		self.clear() # clear graphics
-		self.draw_cell(5,10)
 		# Draw the active cells
 		pyglet.gl.glColor3ub(255,255,255) # white
 		for row in range(len(self.cells)):
 			current_row = self.cells[row]
 			for col in range(len(current_row)):
-				if current_row[col]: self.draw_cell(col,row)
+				if current_row[col]: # square is True
+					self.draw_cell(col,row) # make white
 		self.draw_grid()
 		# Draw ants
 		pyglet.gl.glColor4f(1.0,0.23,0.23,1.0) # blue
 		for ant in self.ants:
-			self.draw_cell(ant.x, ant.y)
+			self.draw_cell(ant.col, ant.row)
 
 	def run(self):
-		clock.set_fps_limit(2)
 		pyglet.clock.schedule(self.move_all)
 		pyglet.app.run()
 
@@ -98,17 +107,14 @@ class Grid(pyglet.window.Window):
 
 	def move(self, ant):
 		# Is the ant on a white cell?
-		current_cell = self.cells[ant.y][ant.x]
-		if current_cell: # is True
-			print "current cell is true"
-			current_cell = False
+		if self.cells[ant.row][ant.col]: # is True
+			self.cells[ant.row][ant.col] = False
 			ant.turn('right')
 		else: # current_cell is False
-			print "current cell is false"
-			self.cells[ant.y][ant.x] = True
-			ant.t/urn('left')
+			self.cells[ant.row][ant.col] = True
+			ant.turn('left')
 
 
 if __name__ == "__main__":
-		h = Grid(int(sys.argv[1]))
+		h = Grid()
 		h.run()
