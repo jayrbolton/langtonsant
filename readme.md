@@ -17,3 +17,4 @@ for a grid of 20x20 pixel cells (default is 10)
 ## Todo
 
 * suggestions?
+* don't redraw grid every turn
